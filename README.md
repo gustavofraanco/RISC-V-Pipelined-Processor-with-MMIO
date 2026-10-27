@@ -1,1 +1,1 @@
-# Processador-RISC-V-com-Pipeline
+# RISC-V (RV32I) PIPELINED - PROJETO
