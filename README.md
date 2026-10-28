@@ -15,6 +15,19 @@ Processador RISC-V de **32** bits (RV32I) com pipeline de **5** estágios implem
 | 7 | `SW`      | S    | 0100011 | ✅ |
 | 8 | `BEQ`     | B    | 1100011 | ✅ |
 
+## Resumo de cobertura do ISA RV32I
+
+| Categoria          | Total ISA | Implementadas | Faltando |
+|--------------------|:---------:|:-------------:|:--------:|
+| R-type             | 10        | 10            | 0        |
+| I-type aritmético  | 9         | 0             | 9        |
+| I-type load        | 5         | 1 (LW)        | 4        |
+| S-type             | 3         | 1 (SW)        | 2        |
+| B-type             | 6         | 1 (BEQ)       | 5        |
+| U-type             | 2         | 0             | 2        |
+| J-type             | 2         | 0             | 2        |
+| **Total**          | **37**    | **13**        | **24**   |
+
 ## Instruções Implementadas
 
 ### Etapa 01. Aritmética, Lógica e Deslocamentos (R-type) - 27/10/2026
