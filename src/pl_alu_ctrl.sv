@@ -10,7 +10,7 @@
 //   Funct7[6:0], Funct3[2:0] : campos da instrucao
 //
 // Saida Operation[3:0] -> pl_alu.sv:
-//   4'd01 ADD  4'd02 SUB  4'd04 OR  4'd05 AND  4'd06 XOR  4'd07 SLL  4'd08 SRA  4'd09 SRL  4'd10 SLTU  4'd11 SLT
+//   4'd01 ADD  4'd02 SUB  4'd04 OR  4'd05 AND  4'd06 XOR  4'd07 SLL  4'd08 SRL  4'd09 SRA  4'd10 SLTU  4'd11 SLT
 // =============================================================================
 
 `timescale 1ns / 1ps
