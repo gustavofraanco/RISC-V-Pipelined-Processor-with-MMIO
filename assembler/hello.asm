@@ -1,12 +1,5 @@
 lw x1,0(x0)
 lw x2,4(x0)
-add x3,x1,x2
-and x4,x3,x1
-lw x5,0(x0)
-add x6,x5,x2
-sw x3,8(x0)
-beq x1,x2,8
-add x7,x1,x2
-beq x1,x5,8
-add x8,x0,x0
-add x8,x1,x4
+sltu x3,x1,x2
+lw x4,1024(x0)    // SW[17:0]          (addr 0x400 = 1024)
+sw x3,1032(x0)    // LEDR <= 0x3FFFF   (addr 0x408 = 1032)
