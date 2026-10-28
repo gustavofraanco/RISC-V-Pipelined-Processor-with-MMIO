@@ -30,7 +30,7 @@ Processador RISC-V de **32** bits (RV32I) com pipeline de **5** estágios implem
 
 ## Instruções a implementar
 
-### Etapa 01. Aritmética, Lógica e Deslocamentos (R-type) - 27/10/2026
+### Etapa 01. Aritmética, lógica e deslocamentos (R-type) - 27/10/2026
 
 | # | Instrução | Tipo | Opcode  | Funct3 |  Funct7  | Status |
 |---|-----------|------|---------|--------|----------|:------:|
@@ -40,7 +40,7 @@ Processador RISC-V de **32** bits (RV32I) com pipeline de **5** estágios implem
 | 4 | `SRA`     | R    | 0110011 | 101    | 01000    | ✅ |
 | 5 | `SLTU`    | R    | 0110011 | 011    | 00000    | ✅ |
 
-### Etapa 02. Aritmética, Lógica e Deslocamentos com Imediatos (I-type) - 03/11/2026
+### Etapa 02. Aritmética, lógica e deslocamentos com imediatos (I-type) - 03/11/2026
 
 | # | Instrução | Tipo | Opcode  | Funct3 |  Funct7  | Status |
 |---|-----------|------|---------|--------|----------|:------:|
