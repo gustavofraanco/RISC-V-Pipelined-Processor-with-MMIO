@@ -1,5 +1,5 @@
 -- ============================================================
--- instruction.mif — gerado por: python assembler.py --dump
+-- instruction.mif â€” gerado por: python assembler.py --dump
 --
 -- 0x000..0x00C : codigo do usuario (13 instrucao(oes))
 -- 0x00D       : beq x0,x0 -> 0x80  (desvio para dump)
