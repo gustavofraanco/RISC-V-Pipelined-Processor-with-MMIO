@@ -51,3 +51,82 @@ Processador RISC-V de **32** bits (RV32I) com pipeline de **5** estágios implem
 | 5 | `SLLI`    | R    | 0010011 | 001    |          | ❌ |
 | 6 | `SRLI`    | R    | 0010011 | 101    |          | ❌ |
 | 7 | `SRAI`    | R    | 0010011 | 101    |          | ❌ |
+
+### Etapa 02. Imediato superior (U-type) - 03/11/2026
+
+| # | Instrução | Tipo | Opcode  | Status |
+|---|-----------|------|---------|:------:|
+| 1 | `LUI`     | U    | 0110111 | ❌ |
+| 2 | `AUIPC`   | U    | 0010111 | ❌ |
+
+### Etapa 03. Acesso à memória — loads (I-type) - 10/11/2026
+
+| # | Instrução | Tipo | Opcode  | Status |
+|---|-----------|------|---------|:------:|
+| 1 | `LB`      | I    | 0000011 | ❌ |
+| 2 | `LH`      | I    | 0000011 | ❌ |
+| 3 | `LBU`     | I    | 0000011 | ❌ |
+| 4 | `LHU`     | I    | 0000011 | ❌ |
+
+### Etapa 03. Acesso à memória — stores (S-type) - 10/11/2026
+
+| # | Instrução | Tipo | Opcode  | Status |
+|---|-----------|------|---------|:------:|
+| 1 | `SB`      | S    | 0100011 | ❌ |
+| 2 | `SH`      | S    | 0100011 | ❌ |
+
+### Etapa 03. Desvios condicionais (B-type) - 10/11/2026
+
+| # | Instrução | Tipo | Opcode  | Status |
+|---|-----------|------|---------|:------:|
+| 1 | `BNE`     | B    | 1100011 | ❌ |
+| 2 | `BLT`     | B    | 1100011 | ❌ |
+| 3 | `BGE`     | B    | 1100011 | ❌ |
+| 4 | `BLTU`    | B    | 1100011 | ❌ |
+| 5 | `BGEU`    | B    | 1100011 | ❌ |
+
+### Etapa 03. Jumps (J-type) - 10/11/2026
+
+| # | Instrução | Tipo | Opcode  | Status |
+|---|-----------|------|---------|:------:|
+| 1 | `JAL`     | J    | 1101111 | ❌ |
+| 2 | `JALR`    | I    | 1100111 | ❌ |
+
+## Arquitetura
+
+### Pipeline de 5 estágios
+
+```
++------+     +------+     +------+     +------+     +------+
+|  IF  | --> |  ID  | --> |  EX  | --> | MEM  | --> |  WB  |
++------+     +------+     +------+     +------+     +------+
+  Busca      Decode       Execução     Memória     Write-back
+  instrução  Regs         ALU          dmem/MMIO   Regfile
+             Sign-ext     Branch
+```
+
+**Registradores de pipeline:** `IF/ID`, `ID/EX`, `EX/MEM`, `MEM/WB` (definidos em `pl_pipe_pkg.sv`).
+
+### Tratamento de hazards
+
+| Hazard | Mecanismo | Detalhe |
+|--------|-----------|---------|
+| RAW (dado) | Forwarding | EX/MEM → EX e MEM/WB → EX (`pl_forward.sv`) |
+| Load-use | Stall | 1 bolha inserida em ID/EX (`pl_hazard.sv`) |
+| Branch taken | Flush | 2 NOPs (IF e ID) na resolução em EX (`pl_datapath.sv`) |
+
+**Resolução de branch no estágio EX:** quando `BEQ` é tomado, o PC retorna ao alvo e os dois estágios anteriores são esvaziados. O custo é de 2 ciclos de penalidade por branch tomado.
+
+**Banco de registradores com escrita em negedge:** a escrita ocorre na borda de descida do clock, garantindo que o estágio ID leia o valor atualizado no próximo posedge sem necessidade de forwarding WB→ID explícito.
+
+### Mapa de memória
+
+| Endereço (byte) | Tamanho | Acesso | Descrição |
+|-----------------|---------|--------|-----------|
+| `0x000 – 0x3FC` | 256 × 32 b | R/W | Memória de dados (`pl_dmem`) |
+| `0x400` | 32 b | R | SW\[17:0\] — chaves deslizantes |
+| `0x404` | 32 b | R | KEY\[3:0\] — botões push |
+| `0x408` | 32 b | W | LEDR\[17:0\] — LEDs vermelhos |
+| `0x40C` | 32 b | W | LEDG\[8:0\] — LEDs verdes |
+| `0x410` | 32 b | R/W | UART RS-232 (8N1, 9600 baud) |
+| `0x414` | 32 b | R | Contador de ciclos de clock (32 bits, reset em 0) |
