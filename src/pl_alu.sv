@@ -3,11 +3,17 @@
 // Unidade Logica e Aritmetica de 32 bits -- RV32I pipelined
 //
 // Codificacao de operacao (Operation[3:0]):
-//   4'd01 : ADD  -- adicao com sinal
-//   4'd02 : SUB  -- subtracao com sinal  (BEQ usa Zero)
-//   4'd04 : OR   -- OU bit a bit
-//   4'd05 : AND  -- E bit a bit
-//   4'd11 : SLT  -- set-less-than com sinal
+//   4'd01 : ADDI, AUIPC, LW, SW
+//   4'd02 : SUB, BEQ
+//   4'd04 : OR, ORI
+//   4'd05 : AND, ANDI
+//   4'd06 : XOR
+//   4'd07 : SLL, SLLI
+//   4'd08 : SRL, SRLI
+//   4'd09 : SRA, SRAI
+//   4'd10 : SLTU
+//   4'd11 : SLT, SLTI
+//   4'd12 : LUI
 // =============================================================================
 
 `timescale 1ns / 1ps
@@ -26,11 +32,11 @@ module pl_alu (
             4'd02:   ALUResult = $signed(SrcA) - $signed(SrcB);      // SUB, BEQ
             4'd04:   ALUResult = SrcA | SrcB;                        // OR, ORI
             4'd05:   ALUResult = SrcA & SrcB;                        // AND, ANDI
-            4'd06:   ALUResult = SrcA ^ SrcB;                        // XOR, XORI
+            4'd06:   ALUResult = SrcA ^ SrcB;                        // XOR
             4'd07:   ALUResult = SrcA << SrcB[4:0];                  // SLL, SLLI
             4'd08:   ALUResult = SrcA >> SrcB[4:0];                  // SRL, SRLI
             4'd09:   ALUResult = $signed(SrcA) >>> SrcB[4:0];        // SRA, SRAI
-            4'd10:   ALUResult = 32'(SrcA < SrcB);                   // SLTU, SLTIU
+            4'd10:   ALUResult = 32'(SrcA < SrcB);                   // SLTU
             4'd11:   ALUResult = 32'($signed(SrcA) < $signed(SrcB)); // SLT, SLTI
             4'd12:   ALUResult = SrcB;                               // LUI
             default: ALUResult = 32'b0;
