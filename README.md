@@ -21,12 +21,12 @@ Processador RISC-V de 32 bits com pipeline de 5 estágios implementado em System
 
 | Categoria          | Total ISA | Implementadas | Faltando |
 |--------------------|:---------:|:-------------:|:--------:|
-| R-type             | 10        | 5             | 5        |
-| I-type aritmético  | 9         | 0             | 9        |
+| R-type             | 10        | 10            | 0        |
+| I-type aritmético  | 9         | 7             | 2        |
 | I-type load        | 5         | 1 (LW)        | 4        |
 | S-type             | 3         | 1 (SW)        | 2        |
 | B-type             | 6         | 1 (BEQ)       | 5        |
-| U-type             | 2         | 0             | 2        |
+| U-type             | 2         | 2             | 0        |
 | J-type             | 2         | 0             | 2        |
 | **Total**          | **37**    | **8**         | **29**   |
 
@@ -36,23 +36,23 @@ Processador RISC-V de 32 bits com pipeline de 5 estágios implementado em System
 
 | # | Instrução | Tipo | Opcode  | Status |
 |---|-----------|------|---------|:------:|
-| 1 | `XOR`     | R    | 0110011 | ❌ |
-| 2 | `SLL`     | R    | 0110011 | ❌ |
-| 3 | `SRL`     | R    | 0110011 | ❌ |
-| 4 | `SRA`     | R    | 0110011 | ❌ |
-| 5 | `SLTU`    | R    | 0110011 | ❌ |
+| 1 | `XOR`     | R    | 0110011 | ✅ |
+| 2 | `SLL`     | R    | 0110011 | ✅ |
+| 3 | `SRL`     | R    | 0110011 | ✅ |
+| 4 | `SRA`     | R    | 0110011 | ✅ |
+| 5 | `SLTU`    | R    | 0110011 | ✅ |
 
 #### Aritmética, lógica e deslocamentos com imediatos (I-type)
 
 | # | Instrução | Tipo | Opcode  | Status |
 |---|-----------|------|---------|:------:|
-| 1 | `ADDI`    | I    | 0010011 | ❌ |
-| 2 | `ANDI`    | I    | 0010011 | ❌ |
-| 3 | `ORI`     | I    | 0010011 | ❌ |
-| 4 | `SLTI`    | I    | 0010011 | ❌ |
-| 5 | `SLLI`    | I    | 0010011 | ❌ |
-| 6 | `SRLI`    | I    | 0010011 | ❌ |
-| 7 | `SRAI`    | I    | 0010011 | ❌ |
+| 1 | `ADDI`    | I    | 0010011 | ✅ |
+| 2 | `ANDI`    | I    | 0010011 | ✅ |
+| 3 | `ORI`     | I    | 0010011 | ✅ |
+| 4 | `SLTI`    | I    | 0010011 | ✅ |
+| 5 | `SLLI`    | I    | 0010011 | ✅ |
+| 6 | `SRLI`    | I    | 0010011 | ✅ |
+| 7 | `SRAI`    | I    | 0010011 | ✅ |
 
 ### Instruções a implementar — Etapa 02
 
