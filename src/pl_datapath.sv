@@ -318,12 +318,48 @@ module pl_datapath (
     // MEM -- Memoria de dados + MMIO
     // =========================================================================
     assign mmio_sel = ex_mem.alu_result[10];
+    
+    // --- Formatador de Store (SB, SH, SW) ---
+    logic [3:0]  byte_enable;
+    logic [31:0] store_data_formatted;
+
+    always_comb begin
+        byte_enable = 4'b0000;
+        store_data_formatted = ex_mem.write_data;
+
+        // se for uma instrucao de escrita e nao for MMIO
+        if (ex_mem.mem_write && !mmio_sel) begin
+            case (ex_mem.funct3)
+                3'b000: begin // SB (Store Byte)
+                    store_data_formatted = {4{ex_mem.write_data[7:0]}}; // Clona o byte 4 vezes
+                    case (ex_mem.alu_result[1:0])
+                        2'b00: byte_enable = 4'b0001; // Autoriza apenas o byte 0
+                        2'b01: byte_enable = 4'b0010; // Autoriza apenas o byte 1
+                        2'b10: byte_enable = 4'b0100; // Autoriza apenas o byte 2
+                        2'b11: byte_enable = 4'b1000; // Autoriza apenas o byte 3
+                    endcase
+                end
+                3'b001: begin // SH (Store Halfword)
+                    store_data_formatted = {2{ex_mem.write_data[15:0]}}; // Clona a halfword 2 vezes
+                    case (ex_mem.alu_result[1])
+                        1'b0: byte_enable = 4'b0011; // Autoriza a metade de baixo
+                        1'b1: byte_enable = 4'b1100; // Autoriza a metade de cima
+                    endcase
+                end
+                3'b010: begin // SW (Store Word original)
+                    store_data_formatted = ex_mem.write_data;
+                    byte_enable = 4'b1111; // Autoriza todos os 4 bytes
+                end
+                default: byte_enable = 4'b0000;
+            endcase
+        end
+    end
 
     pl_dmem dmem (
         .clk       (clk),
-        .MemWrite  (ex_mem.mem_write & ~mmio_sel),
+        .MemWrite  (byte_enable),
         .addr      (ex_mem.alu_result[9:2]),
-        .WriteData (ex_mem.write_data),
+        .WriteData (store_data_formatted),
         .ReadData  (dmem_rd)
     );
 
@@ -345,13 +381,51 @@ module pl_datapath (
 
     assign mem_read_data = mmio_sel ? mmio_rd : dmem_rd;
 
-    // Saidas de observabilidade para o testbench
+    // =========================================================================
+    // ETAPA 03: Formatador de Load (LB, LH, LW, LBU, LHU)
+    // =========================================================================
+    logic [7:0]  load_byte;
+    logic [15:0] load_half;
+    logic [31:0] mem_read_data_formatted;
+
+    // 1. Extrai o byte correto baseado nos 2 ultimos bits do endereco (alu_result[1:0])
+    always_comb begin
+        case (ex_mem.alu_result[1:0])
+            2'b00: load_byte = mem_read_data[7:0];
+            2'b01: load_byte = mem_read_data[15:8];
+            2'b10: load_byte = mem_read_data[23:16];
+            2'b11: load_byte = mem_read_data[31:24];
+        endcase
+    end
+
+    // 2. Extrai a halfword correta baseada no bit 1 do endereco (alu_result[1])
+    always_comb begin
+        case (ex_mem.alu_result[1])
+            1'b0: load_half = mem_read_data[15:0];
+            1'b1: load_half = mem_read_data[31:16];
+        endcase
+    end
+
+    // 3. Extensao de sinal ou zeros baseado no Funct3 da instrucao
+    // Funct3 do RISC-V: 000=LB, 001=LH, 010=LW, 100=LBU, 101=LHU
+    always_comb begin
+        case (ex_mem.funct3)
+            3'b000: mem_read_data_formatted = {{24{load_byte[7]}}, load_byte};   // LB  (mantem sinal)
+            3'b001: mem_read_data_formatted = {{16{load_half[15]}}, load_half};  // LH  (mantem sinal)
+            3'b010: mem_read_data_formatted = mem_read_data;                     // LW  (palavra original)
+            3'b100: mem_read_data_formatted = {24'b0, load_byte};                // LBU (zera o resto)
+            3'b101: mem_read_data_formatted = {16'b0, load_half};                // LHU (zera o resto)
+            default: mem_read_data_formatted = mem_read_data;
+        endcase
+    end
+
+    // Sinais para a escrita na memoria e observabilidade
     assign mem_wr_en   = ex_mem.mem_write & ~mmio_sel;
     assign mem_wr_addr = ex_mem.alu_result[9:2];
-    assign mem_wr_data = ex_mem.write_data;
+    assign mem_wr_data = store_data_formatted;
 
     // =========================================================================
-    // Registrador MEM/WB
+    // Registrador de Pipeline: MEM / WB (Memoria -> Write-Back)
     // =========================================================================
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -364,11 +438,11 @@ module pl_datapath (
             mem_wb.mem_to_reg <= ex_mem.mem_to_reg;
             mem_wb.reg_write  <= ex_mem.reg_write;
             mem_wb.alu_result <= ex_mem.alu_result;
-            mem_wb.read_data  <= mem_read_data;
+            
+            mem_wb.read_data  <= mem_read_data_formatted; 
+            
             mem_wb.rd         <= ex_mem.rd;
         end
     end
-
-    // WB: wb_data = mem_to_reg ? read_data : alu_result  (definido acima, no bloco ID)
 
 endmodule
