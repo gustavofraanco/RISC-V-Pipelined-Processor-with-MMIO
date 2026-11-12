@@ -1,2 +1,5 @@
-addi x1, x0, 15    // x1 = 0 + 15 = 15 (0xF em hexadecimal)
-sw   x1, 1032(x0)  // Escreve x1 (15) nos LEDR (LEDR = 1032)
+addi x1,x0,-1
+sw x1,0(x0)
+sh x0,0(x0)
+lw x2,0(x0)
+sw x2,1032(x0)  // LEDR (LEDR = 1032)
