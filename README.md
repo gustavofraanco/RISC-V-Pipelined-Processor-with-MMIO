@@ -23,12 +23,12 @@ Processador RISC-V de 32 bits com pipeline de 5 estágios implementado em System
 |--------------------|:---------:|:-------------:|:--------:|
 | R-type             | 10        | 10            | 0        |
 | I-type aritmético  | 9         | 7             | 2        |
-| I-type load        | 5         | 1 (LW)        | 4        |
-| S-type             | 3         | 1 (SW)        | 2        |
-| B-type             | 6         | 1 (BEQ)       | 5        |
+| I-type load        | 5         | 5             | 0        |
+| S-type             | 3         | 3             | 0        |
+| B-type             | 6         | 6             | 0        |
 | U-type             | 2         | 2             | 0        |
 | J-type             | 2         | 0             | 2        |
-| **Total**          | **37**    | **8**         | **29**   |
+| **Total**          | **37**    | **33**         | **4**   |
 
 ### Instruções a implementar — Etapa 01
 
@@ -60,27 +60,27 @@ Processador RISC-V de 32 bits com pipeline de 5 estágios implementado em System
 
 | # | Instrução | Tipo | Opcode  | Status |
 |---|-----------|------|---------|:------:|
-| 1 | `LB`      | I    | 0000011 | ❌ |
-| 2 | `LH`      | I    | 0000011 | ❌ |
-| 3 | `LBU`     | I    | 0000011 | ❌ |
-| 4 | `LHU`     | I    | 0000011 | ❌ |
+| 1 | `LB`      | I    | 0000011 | ✅ |
+| 2 | `LH`      | I    | 0000011 | ✅ |
+| 3 | `LBU`     | I    | 0000011 | ✅ |
+| 4 | `LHU`     | I    | 0000011 | ✅ |
 
 #### Acesso à memória — stores (S-type)
 
 | # | Instrução | Tipo | Opcode  | Status |
 |---|-----------|------|---------|:------:|
-| 1 | `SB`      | S    | 0100011 | ❌ |
-| 2 | `SH`      | S    | 0100011 | ❌ |
+| 1 | `SB`      | S    | 0100011 | ✅ |
+| 2 | `SH`      | S    | 0100011 | ✅ |
 
 #### Desvios condicionais (B-type)
 
 | # | Instrução | Tipo | Opcode  | Status |
 |---|-----------|------|---------|:------:|
-| 1 | `BNE`     | B    | 1100011 | ❌ |
-| 2 | `BLT`     | B    | 1100011 | ❌ |
-| 3 | `BGE`     | B    | 1100011 | ❌ |
-| 4 | `BLTU`    | B    | 1100011 | ❌ |
-| 5 | `BGEU`    | B    | 1100011 | ❌ |
+| 1 | `BNE`     | B    | 1100011 | ✅ |
+| 2 | `BLT`     | B    | 1100011 | ✅ |
+| 3 | `BGE`     | B    | 1100011 | ✅ |
+| 4 | `BLTU`    | B    | 1100011 | ✅ |
+| 5 | `BGEU`    | B    | 1100011 | ✅ |
 
 #### Jumps (J-type)
 
@@ -93,8 +93,8 @@ Processador RISC-V de 32 bits com pipeline de 5 estágios implementado em System
 
 | # | Instrução | Tipo | Opcode  | Status |
 |---|-----------|------|---------|:------:|
-| 1 | `LUI`     | U    | 0110111 | ❌ |
-| 2 | `AUIPC`   | U    | 0010111 | ❌ |
+| 1 | `LUI`     | U    | 0110111 | ✅ |
+| 2 | `AUIPC`   | U    | 0010111 | ✅ |
 
 ---
 
