@@ -23,13 +23,15 @@ module pl_alu (
     input  logic [31:0] SrcB,
     input  logic [3:0]  Operation,
     output logic [31:0] ALUResult,
-    output logic        Zero
+    output logic        Zero,
+    output logic        menor_que,
+    output logic        menor_que_unsigned
 );
 
     always_comb begin
         case (Operation)
             4'd01:   ALUResult = $signed(SrcA) + $signed(SrcB);      // ADD, ADDI, AUIPC, LW, SW
-            4'd02:   ALUResult = $signed(SrcA) - $signed(SrcB);      // SUB, BEQ
+            4'd02:   ALUResult = $signed(SrcA) - $signed(SrcB);      // SUB, BEQ, BNE, BLT, BGE, BLTU, BGEU
             4'd04:   ALUResult = SrcA | SrcB;                        // OR, ORI
             4'd05:   ALUResult = SrcA & SrcB;                        // AND, ANDI
             4'd06:   ALUResult = SrcA ^ SrcB;                        // XOR
@@ -44,5 +46,7 @@ module pl_alu (
     end
 
     assign Zero = (ALUResult == 32'b0);
+    assign menor_que = ($signed(SrcA) < $signed(SrcB));
+    assign menor_que_unsigned = (SrcA < SrcB);
 
 endmodule

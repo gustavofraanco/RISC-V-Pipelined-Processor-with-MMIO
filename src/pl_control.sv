@@ -10,8 +10,8 @@
 //   I-type  (0010011): addi, andi, ori, xori, slli, srli, srai, slti, sltiu
 //   U-type  (0110111): lui
 //   U-type  (0010111): auipc
-//   I-type  (0000011): lw
-//   S-type  (0100011): sw
+//   I-type  (0000011): lw, lb, lh, lbu, lhu
+//   S-type  (0100011): sw, sb, sh
 //   B-type  (1100011): beq
 //
 // Tabela de sinais de controle:

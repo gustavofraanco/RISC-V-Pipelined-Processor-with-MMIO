@@ -276,18 +276,35 @@ module pl_datapath (
     assign alu_final_srca = id_ex.alu_srca ? id_ex.pc : fwd_srca;
     // Mux ALUSrc: imediato ou registrador
     assign alu_srcb = id_ex.alu_src ? id_ex.imm_ext : fwd_srcb;
+    
+    logic menor_que;
+    logic menor_que_unsigned;
+    logic condicao_salto;
 
     pl_alu alu (
-        .SrcA      (alu_final_srca),
-        .SrcB      (alu_srcb),
-        .Operation (ALU_CC),
-        .ALUResult (alu_result),
-        .Zero      (zero)
+        .SrcA               (alu_final_srca),
+        .SrcB               (alu_srcb),
+        .Operation          (ALU_CC),
+        .ALUResult          (alu_result),
+        .Zero               (zero),
+        .menor_que          (menor_que),
+        .menor_que_unsigned (menor_que_unsigned)
     );
 
-    // Branch resolvido no estagio EX (flush 2 instrucoes se taken)
-    assign branch_target = id_ex.pc + id_ex.imm_ext;
-    assign pc_src        = id_ex.branch && zero;
+    always_comb begin
+        case (id_ex.funct3)
+            3'b000:  condicao_salto = zero;                // BEQ: salta se rs1 == rs2
+            3'b001:  condicao_salto = ~zero;               // BNE: salta se rs1 != rs2
+            3'b100:  condicao_salto = menor_que;           // BLT: salta se rs1 < rs2 (signed)
+            3'b101:  condicao_salto = ~menor_que;          // BGE: salta se rs1 >= rs2 (signed)
+            3'b110:  condicao_salto = menor_que_unsigned;  // BLTU: salta se rs1 < rs2 (unsigned)
+            3'b111:  condicao_salto = ~menor_que_unsigned; // BGEU: salta se rs1 >= rs2 (unsigned)
+            default: condicao_salto = 1'b0;
+        endcase
+    end
+	 
+    assign branch_target = id_ex.pc + id_ex.imm_ext;       // Branch resolvido no estagio EX (flush 2 instrucoes se taken)
+    assign pc_src        = id_ex.branch && condicao_salto; // salto ocorre se a instrucao for um branch E a condicao for verdadeira
 
     // =========================================================================
     // Registrador EX/MEM
