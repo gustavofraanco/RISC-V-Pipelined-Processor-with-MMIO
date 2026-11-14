@@ -23,11 +23,13 @@ module pl_sign_ext (
     localparam BRANCH = 7'b1100011;
     localparam LUI    = 7'b0110111;
     localparam AUIPC  = 7'b0010111;
+    localparam JAL    = 7'b1101111;
+    localparam JALR   = 7'b1100111;
 
     always_comb begin
         case (Instr[6:0])
             // I-Type: Extensão de sinal do imediato de 12 bits
-            LOAD, I_TYPE: 
+            LOAD, I_TYPE, JALR: 
                 ImmExt = {{20{Instr[31]}}, Instr[31:20]};
 
             // S-Type: Extensão de sinal do imediato dividido (12 bits)
@@ -42,6 +44,9 @@ module pl_sign_ext (
             // U-Type: Coloca os 20 bits no topo e preenche a base com 12 zeros
             LUI, AUIPC: 
                 ImmExt = {Instr[31:12], 12'b0};
+
+            JAL: 
+                ImmExt = {{12{Instr[31]}}, Instr[19:12], Instr[20], Instr[30:21], 1'b0};
 
             default: 
                 ImmExt = 32'b0;

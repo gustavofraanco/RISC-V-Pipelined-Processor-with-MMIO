@@ -48,6 +48,8 @@ module pl_control (
     localparam BRANCH = 7'b1100011;
     localparam LUI    = 7'b0110111;
     localparam AUIPC  = 7'b0010111;
+    localparam JAL    = 7'b1101111;
+    localparam JALR   = 7'b1100111;
 
     always_comb begin
         ALUSrcA  = 1'b0;
@@ -61,23 +63,23 @@ module pl_control (
 
         case (Opcode)
             R_TYPE: begin
-                ALUSrc   = 1'b0; // SrcB = rs2
+                ALUSrc   = 1'b0;   // SrcB = rs2
                 RegWrite = 1'b1;
                 ALUOp    = 3'b010;
             end
             I_TYPE: begin
-                ALUSrc   = 1'b1; // SrcB = Imediato
+                ALUSrc   = 1'b1;   // SrcB = Imediato
                 RegWrite = 1'b1;
                 ALUOp    = 3'b011;
             end
             LUI: begin
-                ALUSrc   = 1'b1; // SrcB = Imediato
+                ALUSrc   = 1'b1;   // SrcB = Imediato
                 RegWrite = 1'b1;
                 ALUOp    = 3'b100;
             end
             AUIPC: begin
-                ALUSrcA  = 1'b1; // SrcA = PC
-                ALUSrc   = 1'b1; // SrcB = Imediato
+                ALUSrcA  = 1'b1;   // SrcA = PC
+                ALUSrc   = 1'b1;   // SrcB = Imediato
                 RegWrite = 1'b1;
                 ALUOp    = 3'b000; // PC + Imediato
             end
@@ -96,6 +98,16 @@ module pl_control (
             BRANCH: begin
                 Branch   = 1'b1;
                 ALUOp    = 3'b001;
+            end
+
+            JAL: begin
+                RegWrite = 1'b1;   // escreve PC + 4 no rd
+                ALUOp    = 3'b101;
+            end
+
+            JALR: begin
+                RegWrite = 1'b1;   // escreve PC + 4 no rd
+                ALUOp    = 3'b110;
             end
             default: ; // sinais permanecem em zero (seguro)
         endcase

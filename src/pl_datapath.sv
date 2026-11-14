@@ -302,9 +302,24 @@ module pl_datapath (
             default: condicao_salto = 1'b0;
         endcase
     end
-	 
-    assign branch_target = id_ex.pc + id_ex.imm_ext;       // Branch resolvido no estagio EX (flush 2 instrucoes se taken)
-    assign pc_src        = id_ex.branch && condicao_salto; // salto ocorre se a instrucao for um branch E a condicao for verdadeira
+	
+    logic jal;
+    logic jalr;
+    logic salto;
+
+    assign jal  = (id_ex.alu_op == 3'b101);
+    assign jalr = (id_ex.alu_op == 3'b110);
+    assign salto = jal | jalr;
+
+    always_comb begin
+        if (jalr) begin
+            branch_target = (alu_final_srca + id_ex.imm_ext) & 32'hFFFFFFFE; // zera o ultimo bit para nao dar nenhum endereco impar 
+        end else begin
+            branch_target = id_ex.pc + id_ex.imm_ext;
+        end
+    end
+
+    assign pc_src = (id_ex.branch && condicao_salto) || salto; // salto ocorre se (a instrucao for um branch E a condicao for verdadeira) OU (a instrucao for um jump)
 
     // =========================================================================
     // Registrador EX/MEM
@@ -324,7 +339,11 @@ module pl_datapath (
             ex_mem.reg_write   <= id_ex.reg_write;
             ex_mem.mem_read    <= id_ex.mem_read;
             ex_mem.mem_write   <= id_ex.mem_write;
-            ex_mem.alu_result  <= alu_result;
+            if (salto) begin
+                ex_mem.alu_result <= id_ex.pc + 32'd4; // salva o endereco de retorno
+            end else begin
+                ex_mem.alu_result <= alu_result;       // salva a conta da ULA
+            end
             ex_mem.write_data  <= fwd_srcb;   // rs2 adiantado (para SW/MMIO)
             ex_mem.rd          <= id_ex.rd;
             ex_mem.funct3      <= id_ex.funct3;
