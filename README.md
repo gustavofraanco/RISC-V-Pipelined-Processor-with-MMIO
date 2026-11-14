@@ -86,8 +86,8 @@ Processador RISC-V de 32 bits com pipeline de 5 estágios implementado em System
 
 | # | Instrução | Tipo | Opcode  | Status |
 |---|-----------|------|---------|:------:|
-| 1 | `JAL`     | J    | 1101111 | ❌ |
-| 2 | `JALR`    | I    | 1100111 | ❌ |
+| 1 | `JAL`     | J    | 1101111 | ✅ |
+| 2 | `JALR`    | I    | 1100111 | ✅ |
 
 #### Imediato superior (U-type)
 
@@ -147,11 +147,17 @@ Seleção: `alu_result[10] = 1` redireciona o acesso ao controlador MMIO (`pl_mm
 
 | Operation | Instrução |
 |-----------|-----------|
-| `4'd01` ADD | LW, SW, ADD |
-| `4'd02` SUB | BEQ (comparação) |
-| `4'd04` OR  | OR |
-| `4'd05` AND | AND |
-| `4'd11` SLT | SLT |
+| `4'd01` ADD | DD, ADDI, AUIPC, LW, SW |
+| `4'd02` SUB | SUB, BRANCHS (comparação) |
+| `4'd04` OR  | OR, ORI |
+| `4'd05` AND | AND, ANDI |
+| `4'd06` XOR | XOR, XORI |
+| `4'd07` SLL | SLL, SLLI |
+| `4'd08` SRL | SRL, SRLI |
+| `4'd09` SRA | SRA, SRAI |
+| `4'd10` SLTU | SLTU |
+| `4'd11` SLT | SLT, SLTI |
+| `4'd12` LUI | LUI |
 
 ---
 
