@@ -5,12 +5,17 @@ DATA_RADIX = HEX;       -- The radix for data values
 CONTENT                 -- Start of (address: data pairs)
 BEGIN
 
-000 : FFF00093;  -- addi x1,x0,-1
-001 : 00102023;  -- sw x1,0(x0)
-002 : 00001023;  -- sh x0,0(x0)
-003 : 00002103;  -- lw x2,0(x0)
-004 : 40202423;  -- sw x2,1032(x0)  // LEDR (LEDR = 1032)
-[005..07F] : 00000013;  -- NOPs ate o endereco 080
+000 : 010000EF;  -- jal x1,16      // salto de 16 bytes, x1 = PC + 4 = 0 + 4 = 4
+001 : 00000063;  -- beq x0,x0,0    // vai ser pulado se tiver funcionando o JAL
+002 : 00000063;  -- beq x0,x0,0    // vai ser pulado se tiver funcionando o JAL
+003 : 00000063;  -- beq x0,x0,0    // vai ser pulado se tiver funcionando o JAL
+004 : 01808113;  -- addi x2,x1,24  // x2 = 4 + 24 = 28
+005 : 000101E7;  -- jalr x3,x2,0   // pula para o endereço x2 = 28; x3 = PC + 4 = 20 + 4 = 24
+006 : 00000063;  -- beq x0,x0,0    // vai ser pulado se tiver funcionando o JALR
+007 : 0FF00213;  -- addi x4,x0,255 // apenas vai para essa linha se o JALR funcionar
+008 : 40402423;  -- sw x4,1032(x0) // LEDR = 1032
+009 : 00000063;  -- beq x0,x0,0
+[00A..07F] : 00000013;  -- NOPs ate o endereco 080
 
 080 : 1E102023;  -- sw x1,480(x0)             x1 -> dmem[0x78]
 081 : 1E202223;  -- sw x2,484(x0)             x2 -> dmem[0x79]
