@@ -30,11 +30,20 @@ module pl_dmem (
     end
     // synthesis translate_on
 
-    always@(posedge clk) begin
-        if (MemWrite[0]) ram[addr][7:0]   <= WriteData[7:0];
-        if (MemWrite[1]) ram[addr][15:8]  <= WriteData[15:8];
-        if (MemWrite[2]) ram[addr][23:16] <= WriteData[23:16];
-        if (MemWrite[3]) ram[addr][31:24] <= WriteData[31:24];
+    logic [31:0] next_word;
+
+    always_comb begin
+        next_word = ram[addr];
+        if (MemWrite[0]) next_word[7:0]   = WriteData[7:0];
+        if (MemWrite[1]) next_word[15:8]  = WriteData[15:8];
+        if (MemWrite[2]) next_word[23:16] = WriteData[23:16];
+        if (MemWrite[3]) next_word[31:24] = WriteData[31:24];
+    end
+
+    always_ff @(posedge clk) begin
+        if (|MemWrite) begin
+            ram[addr] <= next_word;
+        end
     end
 
     assign ReadData = ram[addr];
